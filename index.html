@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>Grand Search System - Full Database</title>
+   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap');
+    
+    body { 
+        font-family: 'Kanit', sans-serif; 
+        background: linear-gradient(135deg, #73aefa 0%, #e2d1c3 100%); /* พื้นหลังโทนละมุน */
+        color: #5d5d5d; 
+        padding: 20px; 
+    }
+    
+    .container { max-width: 1400px; margin: auto; }
+    
+    h2 { 
+        text-align: center; 
+        color: #e9c0f5; /* สีชมพูพาสเทล */
+        text-shadow: 2px 2px 4px rgba(27, 3, 3, 0.5);
+        text-transform: uppercase; 
+    }
+    
+    input { 
+        width: 100%; 
+        padding: 15px; 
+        margin-bottom: 20px; 
+        background: #ffffff; 
+        border: 2px solid #180202; 
+        border-radius: 25px; /* ขอบโค้งมนแบบน่ารัก */
+        color: #555; 
+        text-align: center; 
+        font-size: 18px; 
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    
+    table { 
+        width: 100%; 
+        border-collapse: separate; 
+        border-spacing: 0; 
+        background: #e5e2e2; 
+        border-radius: 20px; 
+        overflow: hidden; 
+        box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    }
+    
+    th { 
+        background: #352f30; 
+        color: #fff; 
+        padding: 15px; 
+        font-weight: 600;
+    }
+    
+    td { 
+        padding: 12px; 
+        border-bottom: 1px solid #fcfcfc; 
+        color: #1a1313; 
+        text-align: center; 
+    }
+    
+    .phonetic { 
+        font-size: 0.75em; 
+        color: #0749a0; /* สีชมพูเข้มขึ้นเล็กน้อยสำหรับคำอ่าน */
+        display: block; 
+    }
+    
+    tr:hover { background: #fff5f7; } /* สีชมพูอ่อนเมื่อเอาเมาส์วาง */
+</style>
+
+<div class="container">
+    <h2>✦ พี่รหัสน้องรหัส ✦</h2>
+    <input type="text" id="searchInput" onkeyup="searchTable()" placeholder="🔍 พิมพ์ค้นหา...">
+    <table>
+        <thead>
+            <tr>
+                <th>รุ่นพี่</th><th>น้องรหัส 1</th><th>น้องรหัส 2</th><th>น้องรหัส 3</th>
+                <th>คำใบ้ 1</th><th>คำใบ้ 2</th><th>คำใบ้ 3</th><th>Dress Code</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+    </table>
+</div>
+
+<script>
+
+const data = [
+    { s: "Silas Sinvere <span class='phonetic'>(ไซ-ลาส ซิน-เวียร์)</span>", j1: "Madelyn Lancaster <span class='phonetic'>(แมด-ลิน แลน-แคส-เตอร์)</span>", j2: "Julian Hayes <span class='phonetic'>(จู-เลียน เฮย์ส)</span>", j3: "Aurelia Rose <span class='phonetic'>(ออ-เร-เลีย โรส)</span>", h1: "ใส่แว่น", h2: "ทำแต่งาน", h3: "สีดำ", dc: "หูหมา" },
+    { s: "Max Ezrel <span class='phonetic'>(แมกซ์ เอซ-เรล)</span>", j1: "August Le Hensley <span class='phonetic'>(ออกัสต์ เลอ เฮนส์-ลีย์)</span>", j2: "Esmeralda Be Korllin <span class='phonetic'>(เอส-เม-รัล-ด้า บี คอล-ลิน)</span>", j3: "Mar Fin Right <span class='phonetic'>(มาร์ ฟิน ไรท์)</span>", h1: "ดื่มทุกวัน", h2: "สีไม่เข้ากับบ้าน", h3: "สีม่วง", dc: "คริสมาส" },
+    { s: "Kurz Doomveil <span class='phonetic'>(เคิร์ซ ดูม-เวล)</span>", j1: "Elfie Teenoi <span class='phonetic'>(เอล-ฟี่ ที-น้อย)</span>", j2: "Akira Ravenwood <span class='phonetic'>(อะ-คิ-ระ เร-เวน-วู้ด)</span>", j3: "-", h1: "เล่ห์เหลี่ยม", h2: "เข้าป่า", h3: "เสียงแหบ", dc: "ผ้าพันคอ" },
+    { s: "Upper StoneC <span class='phonetic'>(อัป-เปอร์ สโตน-ซี)</span>", j1: "Daniela Charlotte Cartier <span class='phonetic'>(ดา-เนียล-ล่า ชาร์-ลอตต์ คาร์-เทียร์)</span>", j2: "Janjao Lalinda Caeleste <span class='phonetic'>(จัน-เจ้า ลา-ลิน-ด้า เซ-เลส-เต้)</span>", j3: "-", h1: "อินโทรเวิร์ดปลอม", h2: "ฟลูไทม์", h3: "ศจ.เรียกหนู", dc: "หัวแพมเพิส" },
+    { s: "Darlene Deva Lopez <span class='phonetic'>(ดาร์-ลีน เด-ว่า โล-เปซ)</span>", j1: "Ania Valerian One <span class='phonetic'>(อา-เนีย วา-เล-เรีย-อัน วัน)</span>", j2: "Khaled Carina <span class='phonetic'>(คา-เลด คา-รี-น่า)</span>", j3: "-", h1: "ดูแลฟลูไทม์", h2: "คู่หมั้นขี้หึง", h3: "เจอที่มอน", dc: "กระเป๋าประจำตัว" },
+    { s: "Alysia Noelle <span class='phonetic'>(อลิ-เซีย โน-เอล)</span>", j1: "Lucais Castorai <span class='phonetic'>(ลู-เคส คาส-โท-ไร)</span>", j2: "Elara Silvermoon <span class='phonetic'>(เอ-ลา-ร่า ซิล-เวอร์-มูน)</span>", j3: "-", h1: "ไม่ค่อยพูด", h2: "มึน", h3: "เห็นทุกที่", dc: "หูแมว" },
+    { s: "Ethan Frost <span class='phonetic'>(อี-ธาน ฟรอสต์)</span>", j1: "Kyero Classnova <span class='phonetic'>(ไค-โร คลาส-โน-ว่า)</span>", j2: "Mignonette Renaldi <span class='phonetic'>(มิน-โย-เนท เร-นัล-ดี้)</span>", j3: "-", h1: "เปลี่ยนชุดทุกวัน", h2: "ดวงตาสีฟ้า", h3: "เวทย์มนต์", dc: "วงเวทย์" },
+    { s: "Nelix Kore <span class='phonetic'>(เน-ลิกซ์ คอ-เร)</span>", j1: "Cirrus Black Dracul <span class='phonetic'>(ซิ-รัส แบล็ค ดรา-คูล)</span>", j2: "Lamorian Fermata <span class='phonetic'>(ลา-มอ-เรียน เฟอร์-มา-ต้า)</span>", j3: "-", h1: "คลาสเที่ยงคืน", h2: "ต่างหูข้างซ้าย", h3: "อ้วน", dc: "กระเป๋าแกะ" },
+    { s: "Zagyos Vanecrest <span class='phonetic'>(ซา-กิ-ออส เวล-เครสต์)</span>", j1: "Amelie Patit <span class='phonetic'>(อา-เม-ลี่ พา-ทิต)</span>", j2: "Serena Violet Wautier <span class='phonetic'>(เซ-เร-น่า ไว-โอ-เล็ต วอ-เทียร์)</span>", j3: "-", h1: "ชุดไม่ซ้ำ", h2: "ใส่จิวดำ", h3: "เกี่ยวกับดวงดาว", dc: "แว่นที่เริ่ดที่สุด" },
+  { s: "Valia Evernight <span class='phonetic'>(วา-เลีย เอ-เวอร์-ไนท์)</span>", j1: "Lunelle Melzaeris <span class='phonetic'>(ลู-เนล เมล-เซ-เอ-ริส)</span>", j2: "Apollow Evermere <span class='phonetic'>(อะ-พอล-โล่ เอ-เวอร์-เมียร์)</span>", j3: "-", h1: "อยู่ตลอด", h2: "กาตุ่ยน้อย", h3: "มีปีก", dc: "แพนด้าดำ" },
+    { s: "Celeste Astrova <span class='phonetic'>(เซ-เลส-เต้ แอส-โทร-ว่า)</span>", j1: "Yuzu Lozano <span class='phonetic'>(ยู-สุ โล-ซา-โน่)</span>", j2: "Mouthlloud Finlee <span class='phonetic'>(เมาท์-ลูด ฟิน-ลี่)</span>", j3: "-", h1: "Introvert =", h2: "แว่นมานี่มา", h3: "เจ้าหมาขาว", dc: "All White" },
+    { s: "Yoshimura Ryo <span class='phonetic'>(โย-ชิ-มุ-ระ เรียว)</span>", j1: "Ophelia Nightshade <span class='phonetic'>(โอ-ฟี-เลีย ไนท์-เชด)</span>", j2: "Joself L. Avanof <span class='phonetic'>(โจ-เซฟ แอล. อะ-วา-นอฟ)</span>", j3: "-", h1: "แว่นตาขาว", h2: "ใส่ต่างหู", h3: "White", dc: "มีขน" },
+    { s: "Neticha Tierna Armstrong <span class='phonetic'>(เน-ทิ-ชา เทียร์-น่า อาร์ม-สตรอง)</span>", j1: "Lapis Lazuli Rain <span class='phonetic'>(ลา-พิส ลา-ซู-ลี่ เรน)</span>", j2: "Bette McCutcheon <span class='phonetic'>(เบต-ตี้ แม็ค-คัต-เชิน)</span>", j3: "-", h1: "เฟียส", h2: "ชะนีจริง", h3: "ฟิล์มมีรถ", dc: "เริ่ดๆ" },
+    { s: "Ophelia Lilith Vandereen <span class='phonetic'>(โอ-ฟี-เลีย ลิ-ลิธ แวน-เดอ-รีน)</span>", j1: "Celine Bonnet <span class='phonetic'>(เซ-ลีน บอน-เน็ต)</span>", j2: "Diana Lita Sacos <span class='phonetic'>(ได-อาน่า ลี-ต้า ซา-คอส)</span>", j3: "-", h1: "ฟักทอง", h2: "เวลน้อย", h3: "อินโทเวิร์ต", dc: "-" },
+    { s: "Aiden Crowhurst <span class='phonetic'>(เอ-เดน โครว์-เฮิร์สต์)</span>", j1: "Naoki Soyeah Church <span class='phonetic'>(นา-โอ-กิ โซ-เยียร์ เชิร์ช)</span>", j2: "Lilith Mcximoff <span class='phonetic'>(ลิ-ลิธ แม็ค-ซิ-มอฟ)</span>", j3: "-", h1: "ชอบนอน", h2: "สร้อยกางเขน", h3: "รหัสมอร์ส", dc: "กิ๊บครีบปลา" },
+    { s: "Oliver Blackwell <span class='phonetic'>(โอ-ลิ-เวอร์ แบล็ค-เวลล์)</span>", j1: "Raven Walther <span class='phonetic'>(เร-เวน วอล-เธอร์)</span>", j2: "Helianthea Solaris Floris <span class='phonetic'>(เฮ-เลียน-เธีย โซ-ลา-ริส ฟลอ-ริส)</span>", j3: "-", h1: "ผมดำ", h2: "ใส่แว่น", h3: "พลาสเตอร์ขาว", dc: "หมวกดำ" },
+    { s: "Lucus Blackwell <span class='phonetic'>(ลู-คัส แบล็ค-เวลล์)</span>", j1: "Emily Cara Wautier <span class='phonetic'>(เอ-มิล-ลี่ คา-ร่า วอ-เทียร์)</span>", j2: "Aglaia Tanachi <span class='phonetic'>(อัก-เล-ย่า ทา-นา-ชิ)</span>", j3: "-", h1: "ผมทอง", h2: "ใส่แว่น", h3: "หน้ากากหมี", dc: "หูหมา" },
+    { s: "Silas Blackwell <span class='phonetic'>(ไซ-ลาส แบล็ค-เวลล์)</span>", j1: "Elsa Rose <span class='phonetic'>(เอล-ซ่า โรส)</span>", j2: "Borax Nightshades <span class='phonetic'>(บอ-แร็กซ์ ไนท์-เชดส์)</span>", j3: "-", h1: "AirPods", h2: "ใส่แว่น", h3: "นาฬิกาดำ", dc: "ต่างหูขาว" },
+    { s: "Zane Blackwell <span class='phonetic'>(เซน แบล็ค-เวลล์)</span>", j1: "Juvellien Serenity <span class='phonetic'>(จู-เวล-เลี่ยน เซ-เร-นิ-ตี้)</span>", j2: "Erika Revencharnia <span class='phonetic'>(เอ-ริ-ก้า เร-เวน-ชาร์-เนีย)</span>", j3: "-", h1: "รองเท้าแตะ", h2: "ลึกลับ", h3: "Introvert", dc: "ต่างหูไม้กางเขน" },
+    { s: "Azalea Okelyn <span class='phonetic'>(อะ-ซา-เลีย โอ-เค-ลิน)</span>", j1: "Shiael Loliper <span class='phonetic'>(ชี-เอล โล-ลิ-เปอร์)</span>", j2: "Lumina Salem <span class='phonetic'>(ลู-มิ-น่า ซา-เล็ม)</span>", j3: "-", h1: "สวย", h2: "น่ารัก", h3: "อือหื้อ", dc: "แว่นเอียง" },
+    { s: "Kirby Belle <span class='phonetic'>(เคอร์-บี้ เบลล์)</span>", j1: "Lumina Salem <span class='phonetic'>(ลู-มิ-น่า ซา-เล็ม)</span>", j2: "Noel Ignatius Whitecroft <span class='phonetic'>(โน-เอล อิก-เน-เชียส ไวท์-ครอฟต์)</span>", j3: "-", h1: "ตื่นสาย", h2: "หนังสือ", h3: "Introvert", dc: "รองเท้าบูท" },
+    { s: "Minplai Vance <span class='phonetic'>(มิน-พลอย แวนซ์)</span>", j1: "Celimine Feher Witches <span class='phonetic'>(เซ-ลิ-มิน เฟ-เฮอร์ วิท-เชส)</span>", j2: "Opal Eloise Boisclair <span class='phonetic'>(โอ-ปอล เอ-โล-อีส บัวส์-แคลร์)</span>", j3: "-", h1: "พาวเวอร์พัฟเกิร์ล", h2: "ชาไทย", h3: "ฮิเมะ", dc: "Belly Chain" },
+    { s: "Lauren Starblush <span class='phonetic'>(ลอ-เรน สตาร์-บลัช)</span>", j1: "Jenifer Suh Lancaster <span class='phonetic'>(เจ-นิ-เฟอร์ ซู แลน-แคส-เตอร์)</span>", j2: "Yuu Serra Evernight <span class='phonetic'>(ยู เซอร์-ร่า เอ-เวอร์-ไนท์)</span>", j3: "-", h1: "แว่น", h2: "หูฟัง", h3: "-", dc: "-" },
+    { s: "Karo Black <span class='phonetic'>(คา-โร แบล็ค)</span>", j1: "Colt De Marine Acheron <span class='phonetic'>(โคลท์ เดอ มา-รีน แอ-เค-รอน)</span>", j2: "Kairo Classnova <span class='phonetic'>(ไค-โร คลาส-โน-ว่า)</span>", j3: "-", h1: "ลึกลับ", h2: "ตื่นไม่เป็นเวลา", h3: "ผมดำ", dc: "แพนด้าดำ" },
+    { s: "Ruby Rain <span class='phonetic'>(รู-บี้ เรน)</span>", j1: "Alaric Silverleaft <span class='phonetic'>(อลา-ริค ซิล-เวอร์-ลีฟท์)</span>", j2: "Fael Gonfalonier <span class='phonetic'>(ฟา-เอล กอน-ฟา-โล-เนียร์)</span>", j3: "-", h1: "นุ่มฟู", h2: "แตกต่าง", h3: "ทาสรัก", dc: "ชุดนักเรียน" },
+    { s: "Naria Evernight <span class='phonetic'>(นา-เรีย เอ-เวอร์-ไนท์)</span>", j1: "Cassian Ravenscrof <span class='phonetic'>(แคส-เซียน เร-เวนส์-ครอฟต์)</span>", j2: "Brayden Froster <span class='phonetic'>(เบร-เดน ฟรอสต์-เตอร์)</span>", j3: "-", h1: "ลึกลับ", h2: "ขี้เซา", h3: "พูดไม่รู้เรื่อง", dc: "ต่างหูดำ" },
+    { s: "Lilly Lunaclair <span class='phonetic'>(ลิล-ลี่ ลู-น่า-แคลร์)</span>", j1: "Jorah Vance <span class='phonetic'>(โจ-ราห์ แวนซ์)</span>", j2: "Redtia Alex <span class='phonetic'>(เรด-เทีย อเล็กซ์)</span>", j3: "-", h1: "คู่...", h2: "ใจดี", h3: "ดอกไม้", dc: "mickeymouse" },
+    { s: "Elias Blackthone <span class='phonetic'>(อี-เลียส แบล็ค-ธอร์น)</span>", j1: "Connor Mooncrest <span class='phonetic'>(คอน-เนอร์ มูน-เครสต์)</span>", j2: "Catherina Carpentier <span class='phonetic'>(แคท-เทอ-ริน-น่า คาร์-เพน-เทียร์)</span>", j3: "-", h1: "Duo...", h2: "Introvert", h3: "ผ้าคลุม", dc: "วัยรุ่นเมกา" },
+    { s: "Garnet Cherrybloom <span class='phonetic'>(การ์-เน็ต เชอร์-รี่-บลูม)</span>", j1: "Daniel Lopez <span class='phonetic'>(ดา-เนียล โล-เปซ)</span>", j2: "Lucas Blackthorn <span class='phonetic'>(ลู-คัส แบล็ค-ธอร์น)</span>", j3: "-", h1: "อัญมณี", h2: "Introvert", h3: "ซาวด์ดี", dc: "GUCCI" },
+    { s: "Brooks Ravenscroft <span class='phonetic'>(บรูคส์ เร-เวนส์-ครอฟต์)</span>", j1: "Arabella Celeste Aethelwulf <span class='phonetic'>(อาร่า-เบล-ล่า เซ-เลส-เต้ เอ-เธล-วูล์ฟ)</span>", j2: "Lumina Salem <span class='phonetic'>(ลู-มิ-น่า ซา-เล็ม)</span>", j3: "-", h1: "หนังสือ", h2: "ไม้กางเขน", h3: "ผมสองสี", dc: "All Black" },
+    { s: "Warrick Vortigern <span class='phonetic'>(วอร์-ริค วอร์-ติ-เกิร์น)</span>", j1: "Chame Seravian <span class='phonetic'>(ชา-เม่ เซ-รา-เวียน)</span>", j2: "Cecilia Arden Lythus <span class='phonetic'>(เซ-ซี-เลีย อาร์-เดน ลี-ธัส)</span>", j3: "-", h1: "ฝ่ายปกครอง", h2: "เพื่อน", h3: "สำรอง", dc: "เเก้มเเดง" }
+];
+
+function searchTable() {
+    let input = document.getElementById("searchInput").value.toLowerCase();
+    let tbody = document.getElementById("tableBody");
+    tbody.innerHTML = "";
+    data.forEach(item => {
+        if (Object.values(item).some(val => val.toLowerCase().includes(input))) {
+            tbody.innerHTML += `<tr><td>${item.s}</td><td>${item.j1}</td><td>${item.j2}</td><td>${item.j3}</td><td>${item.h1}</td><td>${item.h2}</td><td>${item.h3}</td><td>${item.dc}</td></tr>`;
+        }
+    });
+}
+searchTable();
+</script>
+</body>
+</html>
