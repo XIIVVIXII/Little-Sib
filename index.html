@@ -119,11 +119,16 @@ const data = [
 ];
 
 function searchTable() {
-    let input = document.getElementById("searchInput").value.toLowerCase();
+    let input = document.getElementById("searchInput").value.toLowerCase().trim();
     let tbody = document.getElementById("tableBody");
     tbody.innerHTML = "";
+
     data.forEach(item => {
-        if (Object.values(item).some(val => val.toLowerCase().includes(input))) {
+        // สร้างข้อความรวมจากทุกฟิลด์เพื่อใช้ค้นหา
+        let fullText = Object.values(item).join(" ").toLowerCase();
+        
+        // ตรวจสอบว่ามีตัวอักษรพิมพ์ค้นหาอยู่ในข้อความรวมหรือไม่ (รองรับพิมพ์แค่ตัวเดียว)
+        if (input === "" || fullText.includes(input)) {
             tbody.innerHTML += `<tr><td>${item.s}</td><td>${item.j1}</td><td>${item.j2}</td><td>${item.j3}</td><td>${item.h1}</td><td>${item.h2}</td><td>${item.h3}</td><td>${item.dc}</td></tr>`;
         }
     });
